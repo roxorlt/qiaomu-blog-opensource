@@ -1,0 +1,75 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    # 每周一 UTC 00:00 (北京时间周一 08:00)
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # 允许手动触发
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Add upstream
+        run: git remote add upstream https://github.com/joeseesun/qiaomu-blog-opensource.git
+
+      - name: Fetch upstream
+        run: git fetch upstream main
+
+      - name: Check if behind upstream
+        id: check
+        run: |
+          BEHIND=$(git rev-list --count HEAD..upstream/main)
+          echo "behind=$BEHIND" >> $GITHUB_OUTPUT
+          echo "本地落后上游 $BEHIND 个提交"
+
+      - name: Try fast-forward merge
+        id: ff
+        if: steps.check.outputs.behind != '0'
+        continue-on-error: true
+        run: |
+          git checkout main
+          git merge --ff-only upstream/main
+
+      - name: Push if fast-forward succeeded
+        if: steps.check.outputs.behind != '0' && steps.ff.outcome == 'success'
+        run: git push origin main
+
+      - name: Open PR if merge has conflicts
+        if: steps.check.outputs.behind != '0' && steps.ff.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="sync-upstream-$(date +%Y%m%d)"
+          git checkout -B "$BRANCH" upstream/main
+          git push -u origin "$BRANCH" --force
+          gh pr create \
+            --title "chore: sync with upstream ($(date +%Y-%m-%d))" \
+            --body "Auto-sync from upstream joeseesun/qiaomu-blog-opensource failed to fast-forward (conflict with local customizations). Review and resolve manually, then merge." \
+            --head "$BRANCH" \
+            --base main || echo "PR 已存在或创建失败"
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.check.outputs.behind }}" = "0" ]; then
+            echo "✅ 已是最新，无需同步"
+          elif [ "${{ steps.ff.outcome }}" = "success" ]; then
+            echo "✅ 已 fast-forward 合并并推送 ${{ steps.check.outputs.behind }} 个新提交"
+          else
+            echo "⚠️ 存在冲突，已创建 PR 等待人工处理"
+          fi

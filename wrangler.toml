@@ -1,4 +1,4 @@
-name = "qiaomu-blog-opensource"
+name = "roxor-blog"
 main = "worker.ts"
 compatibility_date = "2026-04-14"
 compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
@@ -15,7 +15,7 @@ binding = "WORKERS_AI"
 
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
-service = "qiaomu-blog-opensource"
+service = "roxor-blog"
 
 # Minimal resource bindings for open-source / Deploy to Cloudflare usage.
 # Modern Wrangler and Deploy buttons can auto-provision these resources.
@@ -23,9 +23,12 @@ service = "qiaomu-blog-opensource"
 
 [[d1_databases]]
 binding = "DB"
+database_name = "roxor-blog-db"
+database_id = "d8abf088-4aa1-472c-bdeb-0430204591f2"
 
 [[r2_buckets]]
 binding = "IMAGES"
+bucket_name = "roxor-blog-images"
 
 # Optional Queue binding for background jobs. Uncomment after creating the queue.
 # [[queues.producers]]
@@ -36,9 +39,9 @@ binding = "IMAGES"
 # queue = "qiaomu-blog-background-jobs"
 
 [vars]
-NEXT_PUBLIC_SITE_URL = "https://your-domain.com"
-AI_BASE_URL = "https://api.openai.com/v1"
-AI_MODEL = "gpt-4o-mini"
+NEXT_PUBLIC_SITE_URL = "https://blog.ai-feed.com"
+AI_BASE_URL = "https://api.deepseek.com/v1"
+AI_MODEL = "deepseek-chat"
 WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"
 # Optional enhancement flags. Leave unset/disabled for open-source or low-cost deployments.
 # ENABLE_BACKGROUND_JOBS = "true"
