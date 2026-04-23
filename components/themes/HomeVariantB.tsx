@@ -126,7 +126,7 @@ export function HomeVariantB({
             fontFamily: '"Noto Serif SC", "Source Han Serif SC", Georgia, serif',
             color: FG,
           }}>
-            rox<span style={{ color: ACCENT }}>·</span>or
+            roxor<span style={{ color: ACCENT }}>·</span>blog
           </h1>
         </Link>
         <div className="editorial-masthead-meta" style={{

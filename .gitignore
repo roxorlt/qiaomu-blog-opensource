@@ -48,3 +48,8 @@ next-env.d.ts
 skills/
 wrangler.local.toml
 worker-configuration.d.ts
+
+# Local-only ops docs (personal, not for upstream sync)
+CLAUDE.md
+ops/
+
