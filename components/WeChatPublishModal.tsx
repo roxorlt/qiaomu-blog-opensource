@@ -8,6 +8,11 @@ import {
   buildWechatBridgeCoverImageUrl,
   extractFirstWechatBridgeCoverImageUrl,
 } from '@/lib/wechat-copy'
+import {
+  WECHAT_DEFAULT_AUTHOR,
+  WECHAT_DEFAULT_NEED_OPEN_COMMENT,
+  WECHAT_DEFAULT_ONLY_FANS_CAN_COMMENT,
+} from '@/lib/wechat-publish-defaults'
 
 interface BridgeAccount {
   id: string
@@ -39,13 +44,13 @@ export function WeChatPublishModal({
   const [submitting, setSubmitting] = useState(false)
   const [accounts, setAccounts] = useState<BridgeAccount[]>([])
   const [selectedAccountId, setSelectedAccountId] = useState('')
-  const [author, setAuthor] = useState('')
+  const [author, setAuthor] = useState(WECHAT_DEFAULT_AUTHOR)
   const [digest, setDigest] = useState(defaultDigest)
   const [sourceUrl, setSourceUrl] = useState(defaultSourceUrl)
   const [coverImageUrl, setCoverImageUrl] = useState(defaultCoverImageUrl)
   const [publishNow, setPublishNow] = useState(false)
-  const [needOpenComment, setNeedOpenComment] = useState(false)
-  const [onlyFansCanComment, setOnlyFansCanComment] = useState(false)
+  const [needOpenComment, setNeedOpenComment] = useState(WECHAT_DEFAULT_NEED_OPEN_COMMENT)
+  const [onlyFansCanComment, setOnlyFansCanComment] = useState(WECHAT_DEFAULT_ONLY_FANS_CAN_COMMENT)
   const [loadError, setLoadError] = useState('')
 
   const loadAccounts = async () => {
@@ -78,12 +83,13 @@ export function WeChatPublishModal({
   useEffect(() => {
     if (!isOpen) return
 
+    setAuthor(WECHAT_DEFAULT_AUTHOR)
     setDigest(defaultDigest)
     setSourceUrl(defaultSourceUrl)
     setCoverImageUrl(defaultCoverImageUrl)
     setPublishNow(false)
-    setNeedOpenComment(false)
-    setOnlyFansCanComment(false)
+    setNeedOpenComment(WECHAT_DEFAULT_NEED_OPEN_COMMENT)
+    setOnlyFansCanComment(WECHAT_DEFAULT_ONLY_FANS_CAN_COMMENT)
     void loadAccounts()
   }, [isOpen, defaultDigest, defaultSourceUrl, defaultCoverImageUrl])
 
@@ -101,11 +107,8 @@ export function WeChatPublishModal({
       const { normalizedTitle, exportedHtml } = buildWechatBridgeArticleExport(title, html)
       const finalCoverUrl =
         buildWechatBridgeCoverImageUrl(coverImageUrl) ||
+        buildWechatBridgeCoverImageUrl(defaultCoverImageUrl) ||
         extractFirstWechatBridgeCoverImageUrl(exportedHtml)
-
-      if (!finalCoverUrl) {
-        throw new Error('请提供封面图，或保证正文里至少有一张图片可作为封面')
-      }
 
       const res = await fetch('/api/admin/wechat-publish', {
         method: 'POST',
@@ -206,7 +209,7 @@ export function WeChatPublishModal({
                 type="text"
                 value={author}
                 onChange={(event) => setAuthor(event.target.value)}
-                placeholder="选填"
+                placeholder={WECHAT_DEFAULT_AUTHOR}
                 className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
               />
             </div>
@@ -245,11 +248,11 @@ export function WeChatPublishModal({
                 type="url"
                 value={coverImageUrl}
                 onChange={(event) => setCoverImageUrl(event.target.value)}
-                placeholder="留空时会尝试使用正文第一张图片"
+                placeholder="留空时会自动使用默认封面"
                 className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
               />
               <p className="text-xs text-[var(--editor-muted)]">
-                同域 `/api/images/...` 链接会自动转换成适合微信封面上传的 JPG 版本。
+                同域 `/api/images/...` 链接会自动转换成适合微信封面上传的 JPG 版本；留空时会自动使用默认封面。
               </p>
             </div>
           </div>

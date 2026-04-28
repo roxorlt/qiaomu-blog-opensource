@@ -62,6 +62,7 @@ import {
   useEditorUploadTriggers,
 } from '@/lib/editor-ui'
 import type { EditorImageActionTarget } from '@/lib/resizable-image'
+import { resolvePostCoverImage } from '@/lib/default-cover-images'
 import { buildAutoDescription, normalizePostSlug, sanitizePostSlugInput } from '@/lib/post-utils'
 import { getSiteDisplayUrl } from '@/lib/site-config'
 import { resizeTextareaHeight, useAutoResizeTextarea } from '@/lib/textarea-autosize'
@@ -1472,7 +1473,11 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
         html={editorRef.current?.getHTML() || ''}
         defaultDigest={description}
         defaultSourceUrl={wechatSourceUrl}
-        defaultCoverImageUrl={coverImage}
+        defaultCoverImageUrl={resolvePostCoverImage({
+          cover_image: coverImage,
+          slug: normalizePostSlug(slug) || editSlug || title,
+          title,
+        })}
       />
 
       <InputModal open={inputModal.open} title={inputModal.title} placeholder={inputModal.placeholder} onConfirm={handleInputModalConfirm} onCancel={handleInputModalCancel} />

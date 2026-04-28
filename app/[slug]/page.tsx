@@ -13,6 +13,7 @@ import { getSiteHeaderData } from '@/lib/site'
 import { getRelatedPosts } from '@/lib/related-content'
 import { getPublicContentCacheNamespace } from '@/lib/cache'
 import { getSiteUrl } from '@/lib/site-config'
+import { resolvePostCoverImage } from '@/lib/default-cover-images'
 
 // Cloudflare Workers 缓存策略
 export const revalidate = 86400 // 24小时缓存
@@ -34,9 +35,7 @@ export async function generateMetadata({
     if (!post || !isPubliclyAccessiblePost(post)) return {}
     const searchIndexable = isSearchIndexablePost(post)
 
-    // Extract first image from HTML for OG image
-    const imgMatch = post.html?.match(/<img[^>]+src="([^"]+)"/)
-    const ogImage = post.cover_image || imgMatch?.[1] || `${baseUrl}/icon-512.png`
+    const ogImage = resolvePostCoverImage(post, { baseUrl })
 
     // Password-protected articles should not expose metadata to crawlers.
     if (post.password) {
@@ -197,8 +196,7 @@ export default async function PostPage({
       <main className="page-main mx-auto w-full max-w-3xl px-4 sm:px-6 flex-1 py-8 sm:py-12">
         {searchIndexable && (() => {
           const baseUrl = getSiteUrl()
-          const imgMatch = post.html?.match(/<img[^>]+src="([^"]+)"/)
-          const ogImage = post.cover_image || imgMatch?.[1] || `${baseUrl}/icon-512.png`
+          const ogImage = resolvePostCoverImage(post, { baseUrl })
           const jsonLd = {
             '@context': 'https://schema.org',
             '@type': 'BlogPosting',

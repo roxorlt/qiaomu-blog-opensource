@@ -105,4 +105,27 @@ describe('/api/admin/wechat-publish route', () => {
       publish_id: 'PUBLISH_ID',
     })
   })
+
+  it('applies default author, comments, and cover image when omitted', async () => {
+    mocks.parseJsonBody.mockResolvedValue({
+      account_id: 'main',
+      title: 'No Cover Post',
+      content_html: '<p>Hello</p>',
+    })
+    mocks.fetchWechatBridgeJson.mockResolvedValue({
+      success: true,
+      media_id: 'MEDIA_ID',
+    })
+
+    const response = await POST({} as never)
+    expect(response.status).toBe(200)
+
+    const [, , requestInit] = mocks.fetchWechatBridgeJson.mock.calls[0]
+    const forwarded = JSON.parse(String(requestInit.body))
+
+    expect(forwarded.author).toBe('向阳乔木')
+    expect(forwarded.need_open_comment).toBe(true)
+    expect(forwarded.only_fans_can_comment).toBe(false)
+    expect(forwarded.cover_image_url).toMatch(/^https:\/\/blog\.qiaomu\.ai\/default-covers\/qm-cover-[1-3]\.jpg$/)
+  })
 })
