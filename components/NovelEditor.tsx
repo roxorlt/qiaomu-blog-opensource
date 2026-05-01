@@ -27,6 +27,7 @@ import {
   buildEditorProps,
   FormattingBubble,
   SlashMenu,
+  TableBubble,
 } from '@/lib/editor-extensions'
 import { generatePassword } from '@/lib/password'
 import { InputModal } from '@/components/InputModal'
@@ -1152,6 +1153,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                     }}
                   >
                     <FormattingBubble />
+                    <TableBubble />
                     <SlashMenu />
                   </EditorContent>
                 </div>
