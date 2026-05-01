@@ -260,6 +260,7 @@ body {
   text-align: left;
   vertical-align: top;
   min-width: 80px;
+  position: relative;
 }
 
 :is(.novel-prose, .rich-content) table th {
@@ -280,6 +281,35 @@ body {
 /* 编辑器中表格选中态 */
 .novel-prose table .selectedCell {
   background: var(--editor-selection);
+}
+
+/* Tiptap 列宽拖拽手柄：默认是不可见的 4px 区域，加上明确的鼠标指针 + 悬停高亮 */
+.novel-prose table .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: 0;
+  width: 4px;
+  background: var(--editor-accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.novel-prose table th:hover .column-resize-handle,
+.novel-prose table td:hover .column-resize-handle {
+  opacity: 0.4;
+}
+
+/* 鼠标悬停在列分隔线上时切换为列宽拖拽指针 */
+.novel-prose table th,
+.novel-prose table td {
+  cursor: text;
+}
+
+.novel-prose .resize-cursor,
+.novel-prose .resize-cursor * {
+  cursor: col-resize !important;
 }
 
 :is(.novel-prose, .rich-content) hr {
@@ -951,8 +981,9 @@ body {
   }
 
   .theme-home-editorial .editorial-featured-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) 110px !important;
     gap: 16px !important;
+    align-items: start !important;
   }
 
   .theme-home-editorial .editorial-featured h2,
@@ -980,10 +1011,10 @@ body {
   }
 
   .theme-home-editorial .editorial-featured-art {
-    width: 100% !important;
-    max-width: 240px;
+    width: 110px !important;
+    max-width: 110px;
     aspect-ratio: 4 / 5 !important;
-    margin-top: 4px;
+    margin-top: 0;
   }
 
   .theme-home-editorial .editorial-index-grid {
