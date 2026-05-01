@@ -936,9 +936,10 @@ body {
   }
 
   .theme-home-editorial .editorial-masthead-title {
-    font-size: clamp(52px, 22vw, 92px) !important;
-    line-height: 0.9 !important;
+    font-size: clamp(40px, 13vw, 64px) !important;
+    line-height: 0.95 !important;
     overflow-wrap: anywhere;
+    letter-spacing: -0.03em !important;
   }
 
   .theme-home-editorial .editorial-masthead-meta,
@@ -979,7 +980,10 @@ body {
   }
 
   .theme-home-editorial .editorial-featured-art {
-    display: none !important;
+    width: 100% !important;
+    max-width: 240px;
+    aspect-ratio: 4 / 5 !important;
+    margin-top: 4px;
   }
 
   .theme-home-editorial .editorial-index-grid {
